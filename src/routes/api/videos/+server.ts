@@ -62,6 +62,11 @@ export const GET = async ({ platform }) => {
             },
             uploaded: a.snippet.publishedAt
         }
+    }).sort((a, b) => {
+        const aDate = new Date(a.uploaded);
+        const bDate = new Date(b.uploaded);
+
+        return aDate.valueOf() < bDate.valueOf() ? 1 : -1
     })
 
     return new Response(JSON.stringify(bodies), { 
