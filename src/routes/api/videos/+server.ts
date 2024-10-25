@@ -1,20 +1,15 @@
 import { fetchCacheFirst } from "../../../platform/platformCache.js";
 import { API_BASE, YOUTUBE_API_KEY } from "$env/static/private";
 import type { APIVideosResponse, IYoutubeResponse } from "../types.js";
-
-const channelIds = [
-	"UCegtkvhLG9XYzWfRR99ateQ", // UE Stories
-	"UCEqKKebvZbAQoD3NRIn4jaQ", // Updoot Studios
-	"UC2sabBFKKPFcz8tg0lZwzvg", // OnTapStudios
-];
+import { channels } from "../../../domain.js";
 
 export const GET = async ({ platform }) => {
-	const queryParamsValues = channelIds.map((channelId) => {
+	const queryParamsValues = channels.map((channel) => {
 		return {
 			maxResults: "5",
 			order: "date",
 			safeSearch: "none",
-			channelId,
+			channelId: channel.id,
 			key: YOUTUBE_API_KEY,
 			type: "video",
 			part: "snippet",
@@ -55,8 +50,27 @@ export const GET = async ({ platform }) => {
 	const happyResponses = resolutions.filter((a) => a.status === 200);
 	const unhappyResponses = resolutions.filter((a) => a.status > 200);
 
+	let errorCode = 500;
+	let errorMessage: string | null = null;
+
 	if (unhappyResponses.length > 0) {
-		console.log(unhappyResponses.map((a) => a.status).join(" - "));
+		for (const response of unhappyResponses) {
+			try {
+				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+				const body = (await response.json()) as unknown as any;
+				if (body.error.message && !errorMessage) {
+					errorMessage = `${response.status} - ${body.error.message}`;
+
+					console.log(response.status, JSON.stringify(body.error.message));
+				}
+
+				if (errorCode === 500) {
+					errorCode = response.status;
+				}
+			} catch {
+				console.log(response.status, "No error information provided");
+			}
+		}
 	}
 
 	const parsedItems: IYoutubeResponse[] = (await Promise.all(
@@ -68,7 +82,7 @@ export const GET = async ({ platform }) => {
 	const bodies: APIVideosResponse[] = flatItems
 		.map((a) => {
 			return {
-				link: `https://youtube.com/watch?v=${a.id.videoId}`,
+				id: a.id.videoId,
 				title: a.snippet.title,
 				thumbnail: a.snippet.thumbnails.medium.url,
 				channel: {
@@ -88,15 +102,36 @@ export const GET = async ({ platform }) => {
 	const linksSet = new Set<string>();
 
 	for (const body of bodies) {
-		if (!linksSet.has(body.link)) {
-			linksSet.add(body.link);
+		if (!linksSet.has(body.id)) {
+			linksSet.add(body.id);
 			uniqueBodies.push(body);
 		}
 	}
 
-	return new Response(JSON.stringify(uniqueBodies), {
-		headers: {
-			"Content-Type": "application/json",
+	if (uniqueBodies.length > 0) {
+		return new Response(JSON.stringify(uniqueBodies), {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+	}
+
+	if (errorMessage) {
+		return new Response(JSON.stringify({ errorMessage }), {
+			headers: {
+				"Content-Type": "application/json",
+			},
+			status: errorCode,
+		});
+	}
+
+	return new Response(
+		JSON.stringify({ errorMessage: "Internal server error" }),
+		{
+			headers: {
+				"Content-Type": "application/json",
+			},
+			status: errorCode,
 		},
-	});
+	);
 };

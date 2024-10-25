@@ -38,7 +38,7 @@ export interface IYoutubeResponse {
 }
 
 export interface APIVideosResponse {
-	link: string;
+	id: string;
 	title: string;
 	thumbnail: string;
 	channel: {

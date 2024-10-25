@@ -6,7 +6,19 @@ export const load = async ({ fetch }) => {
 	let errorMessage: string | undefined;
 
 	if (!res.ok) {
-		errorMessage = "API response was not successful";
+		try {
+			const body = (await res.json()) as { errorMessage: string };
+			if (typeof body?.errorMessage !== "undefined") {
+				errorMessage = body.errorMessage;
+			}
+		} catch {
+			errorMessage = "API response was not successful";
+		}
+
+		return {
+			body: [],
+			errorMessage,
+		};
 	}
 
 	const body: APIVideosResponse[] = await res
