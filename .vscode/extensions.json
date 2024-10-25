@@ -2,7 +2,8 @@
 	"recommendations": [
 		"biomejs.biome",
 		"svelte.svelte-vscode",
-		"ms-vscode.vscode-typescript-next"
+		"ms-vscode.vscode-typescript-next",
+		"bradlc.vscode-tailwindcss"
 	],
 	"unwantedRecommendations": [
 		"dbaeumer.vscode-eslint",
