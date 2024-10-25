@@ -19,6 +19,10 @@ onMount(() => {
 });
 </script>
 
+<svelte:head>
+    <link rel="icon" href="https://www.reddit.com/favicon.ico" />
+</svelte:head>
+
 <div class="mx-8 sm:mx-[25%] mt-2">
 <slot />
 </div>
