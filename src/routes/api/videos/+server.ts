@@ -1,5 +1,6 @@
 import { fetchCacheFirst } from "../../../platform/platformCache.js";
 import { API_BASE, YOUTUBE_API_KEY } from "$env/static/private";
+import type { APIVideosResponse, IYoutubeResponse } from "../types.js";
 
 const channelIds = [
 	"UCegtkvhLG9XYzWfRR99ateQ", // UE Stories
@@ -58,11 +59,14 @@ export const GET = async ({ platform }) => {
 		console.log(unhappyResponses.map((a) => a.status).join(" - "));
 	}
 
-	const flatItems = (await Promise.all(happyResponses.map((res) => res.json())))
-	// @ts-expect-error Prototyping - not typed API yet
-		.flatMap((a) => a.items);
+	const parsedItems: IYoutubeResponse[] = (await Promise.all(
+		happyResponses.map((res) => res.json()),
+	)) as unknown as IYoutubeResponse[];
 
-	const bodies = flatItems
+	const flatItems = parsedItems.flatMap((a) => a.items);
+
+	console.log(flatItems);
+	const bodies: APIVideosResponse[] = flatItems
 		.map((a) => {
 			return {
 				link: `https://youtube.com/watch?v=${a.id.videoId}`,
