@@ -20,7 +20,11 @@ export const fetchCacheFirst = async (
 	if (res.ok && platform?.caches?.default) {
 		try {
 			const responseToCache = res.clone();
-			platform.ctx.waitUntil(platform.caches.default.put(url, responseToCache));
+			if (platform?.ctx) {
+				platform.ctx.waitUntil(
+					platform.caches.default.put(url, responseToCache),
+				);
+			}
 		} catch (err) {
 			console.log("Failed to place successful response in cache", err);
 		}
