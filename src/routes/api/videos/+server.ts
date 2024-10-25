@@ -65,7 +65,6 @@ export const GET = async ({ platform }) => {
 
 	const flatItems = parsedItems.flatMap((a) => a.items);
 
-	console.log(flatItems);
 	const bodies: APIVideosResponse[] = flatItems
 		.map((a) => {
 			return {
@@ -85,7 +84,17 @@ export const GET = async ({ platform }) => {
 			return aDate.valueOf() < bDate.valueOf() ? 1 : -1;
 		});
 
-	return new Response(JSON.stringify(bodies), {
+	const uniqueBodies: APIVideosResponse[] = [];
+	const linksSet = new Set<string>();
+
+	for (const body of bodies) {
+		if (!linksSet.has(body.link)) {
+			linksSet.add(body.link);
+			uniqueBodies.push(body);
+		}
+	}
+
+	return new Response(JSON.stringify(uniqueBodies), {
 		headers: {
 			"Content-Type": "application/json",
 		},
