@@ -53,7 +53,9 @@ onMount(() => {
 		<h2 class="text-xl">Here are some deeplinks to the channels</h2>
 
 		{#each channels as channel}
-			<a href={deeplinks($hasTouchscreen).channel(channel.id)} class="underline">{channel.name}</a>
+			<div>
+				<a href={deeplinks($hasTouchscreen).channel(channel.id)} class="underline">{channel.name}</a>
+			</div>
 		{/each}
 	</main>
 {:else}
