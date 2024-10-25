@@ -4,12 +4,15 @@ import Video from "../components/Video.svelte";
 import type { Videos } from "../components/Video.types";
 import { channels, contextKeys, deeplinks } from "../domain";
 import type { PageData } from "./$types";
+import type { Writable } from "svelte/store";
 
 export let data: PageData;
 let { body, errorMessage } = data;
 let saveErrorMessage = errorMessage;
 
-const hasTouchscreen = getContext<boolean>(contextKeys.hasTouchscreen);
+const hasTouchscreen = getContext<Writable<boolean>>(
+	contextKeys.hasTouchscreen,
+);
 
 const days: Record<string, Videos[]> = body.reduce(
 	(acc, video) => {
@@ -50,7 +53,7 @@ onMount(() => {
 		<h2 class="text-xl">Here are some deeplinks to the channels</h2>
 
 		{#each channels as channel}
-			<a href={deeplinks(hasTouchscreen).channel(channel.id)} class="underline">{channel.name}</a>
+			<a href={deeplinks($hasTouchscreen).channel(channel.id)} class="underline">{channel.name}</a>
 		{/each}
 	</main>
 {:else}

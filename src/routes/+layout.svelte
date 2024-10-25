@@ -1,17 +1,21 @@
 <script lang="ts">
-import { setContext, onMount } from "svelte";
+import { setContext, onMount, getContext } from "svelte";
 import "../app.css";
 import { contextKeys } from "../domain";
+import { writable, type Writable } from "svelte/store";
 
-setContext(contextKeys.hasTouchscreen, false);
+setContext(contextKeys.hasTouchscreen, writable(false));
 
+const hasTouchscreenStore = getContext<Writable<boolean>>(
+	contextKeys.hasTouchscreen,
+);
 onMount(() => {
 	const touchscreen =
 		"ontouchstart" in window ||
 		navigator.maxTouchPoints > 0 ||
 		// @ts-ignore not in standard library
 		navigator.msMaxTouchPoints > 0;
-	setContext(contextKeys.hasTouchscreen, touchscreen);
+	hasTouchscreenStore.set(touchscreen);
 });
 </script>
 

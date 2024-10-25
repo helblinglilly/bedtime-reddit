@@ -2,10 +2,13 @@
 import { getContext, onMount } from "svelte";
 import type { Videos as Video } from "./Video.types";
 import { contextKeys, deeplinks } from "../domain";
+import type { Writable } from "svelte/store";
 
 export let video: Video;
 
-const hasTouchscreen = getContext<boolean>(contextKeys.hasTouchscreen);
+const hasTouchscreen = getContext<Writable<boolean>>(
+	contextKeys.hasTouchscreen,
+);
 
 let title = video.title;
 
@@ -20,7 +23,7 @@ onMount(() => {
 });
 </script>
 
-<a href={deeplinks(hasTouchscreen).video(video.id)} 
+<a href={deeplinks($hasTouchscreen).video(video.id)} 
     class="w-full bg-[#1e2327] rounded-md p-4 max-w-[450px] justify-center grid gap-2">
         <img src={video.thumbnail} alt={video.title} class="w-full h-auto rounded-md"/>
         <h3 class="text-xl">{title}</h3>
