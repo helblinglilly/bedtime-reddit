@@ -1,0 +1,13 @@
+{
+	"eslint.format.enable": false,
+	"editor.defaultFormatter": "biomejs.biome",
+	"[javascript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[svelte]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	}
+}
