@@ -1,6 +1,10 @@
+import { baseLogger } from "$lib/log.js";
 import type { APIVideosResponse } from "./api/types.js";
 
-export const load = async ({ fetch }) => {
+export const load = async ({ fetch, ctx }: App.Platform) => {
+  // const log = baseLogger.withExecutionContext(ctx);
+  baseLogger.info("hello part 2");
+
 	const res = await fetch("/api/videos");
 
 	let errorMessage: string | undefined;

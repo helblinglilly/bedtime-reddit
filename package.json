@@ -37,5 +37,8 @@
     "vitest": "^2.0.0",
     "wrangler": "^3.83.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@logtail/edge": "^0.5.4"
+  }
 }

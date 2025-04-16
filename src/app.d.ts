@@ -3,6 +3,7 @@
 declare global {
 	namespace App {
 		interface Platform {
+		  fetch: (url: string) => Promise<{ ok: boolean, json: () => Promise<unknown>}>
 			env: Env;
 			cf: CfProperties;
 			ctx: ExecutionContext;
@@ -11,4 +12,4 @@ declare global {
 	}
 }
 
-export {};
+export { };
