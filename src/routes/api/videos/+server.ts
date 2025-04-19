@@ -1,9 +1,12 @@
-import { fetchCacheFirst } from "../../../platform/platformCache.js";
 import { API_BASE, YOUTUBE_API_KEY } from "$env/static/private";
-import type { APIVideosResponse, IYoutubeResponse } from "../types.js";
+import { Logger } from "$lib/log.js";
 import { channels } from "../../../domain.js";
+import { fetchCacheFirst } from "../../../platform/platformCache.js";
+import type { APIVideosResponse, IYoutubeResponse } from "../types.js";
 
-export const GET = async ({ platform }) => {
+export const GET = async (platform: App.Platform) => {
+  const log = new Logger(platform?.ctx);
+
 	const queryParamsValues = channels.map((channel) => {
 		return {
 			maxResults: "5",
@@ -30,7 +33,10 @@ export const GET = async ({ platform }) => {
 		.map((a) => a.reason);
 
 	if (rejectedResolutions.length > 0) {
-		console.log(rejectedResolutions.length, "requests failed");
+  	 log.error(`Some ${API_BASE}/search requests have failed`, {
+  		  failedRequests: rejectedResolutions.length
+  		})
+
 		return new Response(
 			JSON.stringify({
 				error: "At least one request has failed",

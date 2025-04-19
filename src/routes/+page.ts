@@ -1,15 +1,17 @@
-import { baseLogger } from "$lib/log.js";
+import { Logger, UserImpacts } from "$lib/log.js";
 import type { APIVideosResponse } from "./api/types.js";
 
 export const load = async ({ fetch, ctx }: App.Platform) => {
-  // const log = baseLogger.withExecutionContext(ctx);
-  baseLogger.info("hello part 2");
+  const log = new Logger(ctx);
 
 	const res = await fetch("/api/videos");
 
 	let errorMessage: string | undefined;
 
 	if (!res.ok) {
+	  log.error("/api/videos responded with non-200 status code", {
+			userImpact: UserImpacts.NO_VIDEOS,
+		});
 		try {
 			const body = (await res.json()) as { errorMessage: string };
 			if (typeof body?.errorMessage !== "undefined") {
@@ -30,9 +32,13 @@ export const load = async ({ fetch, ctx }: App.Platform) => {
 		.then((a) => a as APIVideosResponse[])
 		.catch(() => {
 			errorMessage = "Failed to JSON parse API response";
+			log.error("/api/videos response was not JSON parsable", {
+			userImpact: UserImpacts.NO_VIDEOS,
+		});
 			return [];
 		});
 
+	log.info('successful')
 	return {
 		errorMessage,
 		body,

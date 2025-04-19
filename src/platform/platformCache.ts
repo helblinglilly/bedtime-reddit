@@ -1,9 +1,12 @@
+import { Logger, UserImpacts } from "$lib/log";
 import { getCacheAge } from "./videoCache";
 
 export const fetchCacheFirst = async (
 	url: string | URL,
 	platform: Readonly<App.Platform> | undefined,
 ): Promise<Response> => {
+  const log = new Logger(platform?.ctx);
+
 	const parsedUrl = new URL(url);
 	const req = new Request(parsedUrl);
 
@@ -14,7 +17,9 @@ export const fetchCacheFirst = async (
 				return cacheResponse;
 			}
 		} catch (err) {
-			console.log("Tried to read from cache but got an error", err);
+      log.warn("Tried to read from cache but got an error", {
+        userImpact: UserImpacts.PERFORMANCE
+      });
 		}
 	}
 
