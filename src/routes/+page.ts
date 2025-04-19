@@ -1,7 +1,9 @@
 import { Logger, UserImpacts } from "$lib/log.js";
 import type { APIVideosResponse } from "./api/types.js";
 
-export const load = async ({ fetch, ctx }: App.Platform) => {
+export const load = async (platform: App.Platform) => {
+  console.log(platform, Object.keys(platform));
+  const { fetch, ctx } = platform;
   const log = new Logger(ctx);
 
 	const res = await fetch("/api/videos");
