@@ -5,8 +5,6 @@ import type { APIVideosResponse, IYoutubeResponse } from "../types.js";
 import type { RequestEvent } from "./$types.js";
 
 export const GET = async ({ platform, locals }: RequestEvent) => {
-  locals.logger.error('Test')
-
 	const queryParamsValues = channels.map((channel) => {
 		return {
 			maxResults: "5",
@@ -20,11 +18,26 @@ export const GET = async ({ platform, locals }: RequestEvent) => {
 	});
 
 	const promises = queryParamsValues.map((queryParamValue) => {
-		const queryParams = new URLSearchParams(queryParamValue);
-		return fetchCacheFirst(
-			`${API_BASE}/search?${queryParams.toString()}`,
-			platform,
-		);
+	  return new Promise((res, rej) => {
+			const queryParams = new URLSearchParams(queryParamValue);
+			const url = `${API_BASE}/search?${queryParams.toString()}`
+
+			return fetchCacheFirst(
+  		  url,
+    		platform,
+  		).then((result) => {
+        locals.logger.info('YoutubeAPIRequest', {
+          requestUrl: url,
+        })
+        res(result);
+      }).catch((err) => {
+        locals.logger.error('YoutubeAPIRequest', {
+          requestUrl: url,
+          error: err
+        })
+        rej(err);
+      })
+		})
 	});
 
 	const settledResolutions = await Promise.allSettled(promises);
@@ -33,7 +46,6 @@ export const GET = async ({ platform, locals }: RequestEvent) => {
 		.map((a) => a.reason);
 
 	if (rejectedResolutions.length > 0) {
-		console.log(rejectedResolutions.length, "requests failed");
 		return new Response(
 			JSON.stringify({
 				error: "At least one request has failed",
