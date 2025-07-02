@@ -1,9 +1,12 @@
-import { fetchCacheFirst } from "../../../platform/platformCache.js";
 import { API_BASE, YOUTUBE_API_KEY } from "$env/static/private";
-import type { APIVideosResponse, IYoutubeResponse } from "../types.js";
 import { channels } from "../../../domain.js";
+import { fetchCacheFirst } from "../../../platform/platformCache.js";
+import type { APIVideosResponse, IYoutubeResponse } from "../types.js";
+import type { RequestEvent } from "./$types.js";
 
-export const GET = async ({ platform }) => {
+export const GET = async ({ platform, locals }: RequestEvent) => {
+  locals.logger.error('Test')
+
 	const queryParamsValues = channels.map((channel) => {
 		return {
 			maxResults: "5",
