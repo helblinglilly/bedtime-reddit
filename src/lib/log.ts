@@ -2,6 +2,7 @@ import { PUBLIC_ENVIRONMENT } from '$env/static/public';
 import type { Edge } from "@logtail/edge/dist/es6/edge";
 import type { EdgeWithExecutionContext } from '@logtail/edge/dist/es6/edgeWithExecutionContext';
 import type { RequestEvent } from "@sveltejs/kit";
+import { v4 as uuidv4 } from 'uuid';
 import { logtailLogger } from "./logtail";
 
 export interface ILogger {
@@ -21,10 +22,15 @@ const Logger = (event?: RequestEvent<Partial<Record<string, string>>, string | n
   const baseAttributes: Record<string, any> = {};
 
   if (event) {
-    baseAttributes.url = event.url.pathname;
+    baseAttributes.url = {
+      href: event.url.href,
+      host: event.url.host,
+      pathname: event.url.pathname,
+    };
     baseAttributes.method = event.request.method;
     baseAttributes.headers = Object.fromEntries(event.request.headers);
     baseAttributes.ip = event.getClientAddress?.();
+    baseAttributes.requestId = uuidv4()
   }
 
   return {

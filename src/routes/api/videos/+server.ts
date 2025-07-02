@@ -25,13 +25,13 @@ export const GET = async ({ platform, locals }: RequestEvent) => {
 			return fetchCacheFirst(
   		  url,
     		platform,
-  		).then((result) => {
-        locals.logger.info('YoutubeAPIRequest', {
+  		).then(async (result) => {
+        await locals.logger.info('YoutubeAPIRequest', {
           requestUrl: url,
         })
         res(result);
-      }).catch((err) => {
-        locals.logger.error('YoutubeAPIRequest', {
+      }).catch(async (err) => {
+        await locals.logger.error('YoutubeAPIRequest', {
           requestUrl: url,
           error: err
         })
