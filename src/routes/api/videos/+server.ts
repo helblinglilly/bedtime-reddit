@@ -28,11 +28,13 @@ export const GET = async ({ platform, locals }: RequestEvent) => {
   		).then(async (result) => {
         await locals.logger.info('YoutubeAPIRequest', {
           requestUrl: url,
+          success: true,
         })
         res(result);
       }).catch(async (err) => {
         await locals.logger.error('YoutubeAPIRequest', {
           requestUrl: url,
+          success: false,
           error: err
         })
         rej(err);

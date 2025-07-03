@@ -5,7 +5,12 @@ export const handle: Handle = async ({ event, resolve }) => {
   const logger = Logger(event);
   event.locals.logger = logger;
 
-  await logger.info('ServerRequest')
 
-  return await resolve(event);
+  const response = await resolve(event);
+
+  await logger.info('ServerRequest', {
+    success: response.ok
+  })
+
+  return response;
 };
