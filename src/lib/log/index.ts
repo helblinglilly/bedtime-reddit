@@ -4,6 +4,7 @@ import type { EdgeWithExecutionContext } from '@logtail/edge/dist/es6/edgeWithEx
 import type { RequestEvent } from "@sveltejs/kit";
 import { v4 as uuidv4 } from 'uuid';
 import { logtailLogger } from "./logtail";
+import { newrelicLogger } from './newrelic';
 
 export interface ILogger {
   info: (message: string, attributes?: Record<string, any>) => Promise<void>,
@@ -18,6 +19,8 @@ const Logger = (event?: RequestEvent<Partial<Record<string, string>>, string | n
   if (context && typeof logtailLogger.withExecutionContext === 'function') {
     logtail = logtailLogger.withExecutionContext(context);
   }
+
+  const newrelic = newrelicLogger();
 
   const baseAttributes: Record<string, any> = {};
 
@@ -48,6 +51,11 @@ const Logger = (event?: RequestEvent<Partial<Record<string, string>>, string | n
         ...attributes
       });
 
+      newrelic.sendToNrLogAPI('info', message, {
+        ...baseAttributes,
+        ...attributes
+      })
+
       if (logtail === logtailLogger) {
         await logtail.flush().catch((err) => {
           console.log(err);
@@ -67,6 +75,11 @@ const Logger = (event?: RequestEvent<Partial<Record<string, string>>, string | n
         ...baseAttributes,
         ...attributes
       });
+
+      newrelic.sendToNrLogAPI('error', message, {
+        ...baseAttributes,
+        ...attributes
+      })
 
       if (logtail === logtailLogger) {
         await logtail.flush().catch((err) => {
