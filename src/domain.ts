@@ -10,6 +10,10 @@ export const channels = [
 	{
 		name: "On Tap Studios",
 		id: "UC2sabBFKKPFcz8tg0lZwzvg",
+  },
+  {
+		name: "Internet Is Fun Studios",
+		id: "UCyO5LhbJlmBXqEPSxKascsA",
 	},
 ];
 
