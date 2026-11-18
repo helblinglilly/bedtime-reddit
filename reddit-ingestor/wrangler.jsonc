@@ -12,14 +12,21 @@
 	},
 	"triggers": {
 		"crons": [
-			"* * * * *"
+			"0 0 1 * *"
 		]
 	},
+	"secrets_store_secrets": [
+		{
+			"binding": "YOUTUBE_API_KEY",
+			"store_id": "a78c16840ef34b0494de066c96dafe35",
+			"secret_name": "BEDTIME_REDDIT_YOUTUBE_API_KEY"
+		}
+	],
 	"d1_databases": [
 			{
 				"binding": "DB",
 				"database_name": "bedtime-reddit",
-				"database_id": "00000000-0000-0000-0000-000000000000"
+				"database_id": "29c36bd4-9a63-4656-962d-6eae8ef97eee"
 			}
 		],
 		"upload_source_maps": true

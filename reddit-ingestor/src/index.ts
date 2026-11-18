@@ -15,6 +15,9 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { getChannelVideos } from '../lib/youtubeApi/api';
+import { channels } from './channels';
+
 export default {
 	async fetch(req) {
 		const url = new URL(req.url);
@@ -26,6 +29,27 @@ export default {
 	// The scheduled handler is invoked at the interval set in our wrangler.jsonc's
 	// [[triggers]] configuration.
 	async scheduled(event, env, ctx): Promise<void> {
+		const freshVideosPromises = await Promise.allSettled(
+			channels.map((channel) => {
+				return getChannelVideos(channel.id, env);
+			}),
+		);
+
+		const freshVideos = freshVideosPromises.filter((promise) => promise.status === 'fulfilled').map((promise) => promise.value);
+		const errors = freshVideosPromises.filter((promise) => promise.status === 'rejected').map((promise) => promise.reason);
+
+		errors.forEach((error) => {
+			console.error(error);
+		});
+
+		if (freshVideos.length === 0 && errors.length > 0) {
+			throw new Error('All Youtube API Request have failed');
+		}
+
+		if (freshVideos.length > 0 && errors.length > 0) {
+			console.warn('Some API requests have failed');
+		}
+
 		// A Cron Trigger can make requests to other endpoints on the Internet,
 		// publish to a Queue, query a D1 Database, and much more.
 		//
