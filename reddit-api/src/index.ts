@@ -1,6 +1,6 @@
 import { fromHono } from "chanfana";
 import { Hono } from "hono";
-import { VideoList } from "./endpoints/taskList";
+import { VideoList } from "./endpoints/videoList";
 
 const app = new Hono<{ Bindings: Env }>();
 

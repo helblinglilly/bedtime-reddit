@@ -20,7 +20,7 @@ export class VideoList extends OpenAPIRoute {
 
   async handle(c: AppContext) {
     const result = await c.env.DB.prepare(
-      "SELECT * FROM videos order by videos.created_at DESC",
+      "SELECT * FROM videos order by videos.uploaded_at DESC",
     ).all<{
       id: number;
       video_id: string;
