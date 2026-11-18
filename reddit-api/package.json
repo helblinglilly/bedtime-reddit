@@ -1,0 +1,23 @@
+{
+  "name": "cloudflare-workers-openapi",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "deploy": "npm run configure:ci && wrangler deploy --config wrangler.ci.json",
+    "configure:ci": "node scripts/configure-ci.mjs",
+    "check": "node --test scripts/configure-ci.test.mjs && wrangler types --check && tsc --noEmit && wrangler deploy --dry-run",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "chanfana": "^3.3.0",
+    "hono": "^4.12.12",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.165.0"
+  }
+}

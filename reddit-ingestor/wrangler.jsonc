@@ -28,8 +28,8 @@
 				"database_name": "bedtime-reddit",
 				"database_id": "29c36bd4-9a63-4656-962d-6eae8ef97eee"
 			}
-		],
-		"upload_source_maps": true
+	],
+	"upload_source_maps": true
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

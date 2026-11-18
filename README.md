@@ -21,12 +21,18 @@ npx wrangler secrets-store secret create 00000000-0000-0000-0000-000000000000 --
 
 After changing bindings, run `npm run cf-typegen`. Run `npm run check` to check generated types, TypeScript, and the Worker build.
 
+## Reddit API
+
+From `reddit-api/`, using Node.js 24, run `npm ci` and `npm run dev`. Run `npm run check` for configuration-generator tests, generated-type checks, TypeScript, and a dry-run build. Run `npm run cf-typegen` after changing bindings.
+
+The API shares the ingestor's D1 database through `env.DB`, but has no YouTube Secrets Store binding. Its checked-in database UUID is a local-development placeholder. `npm run deploy` requires `D1_DATABASE_ID` and generates the ignored `wrangler.ci.json`; `D1_DATABASE_NAME` optionally overrides `bedtime-reddit`. Do not deploy the checked-in configuration directly to production.
+
 ## GitHub CI/CD
 
 `.github/workflows/deploy-workers.yml` owns application checks and deployment:
 
-- Pull requests affecting the ingestor or workflow run checks without production secrets.
-- Matching pushes to `rearchitecture` run checks, then deploy the ingestor using the GitHub `production` environment.
+- Pull requests affecting either Worker or the workflow run both Workers' checks without production secrets.
+- Matching pushes to `rearchitecture` run checks, then deploy both Workers using the GitHub `production` environment. The API waits for the ingestor deployment, which applies shared D1 migrations first.
 - Manual workflow dispatch can deploy from `rearchitecture` after checks pass.
 - Production deployments are serialized per worker.
 
@@ -42,8 +48,8 @@ The `production` environment must provide these secrets (currently provisioned b
 
 Infrastructure reuses the existing account-wide Secrets Store and manages only its Workers-scoped secret named `BEDTIME_REDDIT_YOUTUBE_API_KEY`, and publishes `YOUTUBE_SECRETS_STORE_ID` to the GitHub `production` environment. The deployment token must also be authorized to bind Secrets Store secrets (Secrets Store Deployer); CI never receives the YouTube API key value. See [Cloudflare's Workers integration](https://developers.cloudflare.com/secrets-store/integrations/workers/).
 
-Terraform continues to own database provisioning; GitHub Actions owns Worker deployment. There are no schema migrations yet, so deployment does not apply migrations. Add an explicit migration step when the schema is introduced.
+Terraform continues to own database provisioning; GitHub Actions owns Worker deployment. The ingestor deployment applies shared D1 migrations before deploying. The API does not apply migrations.
 
-Configure a branch protection rule requiring `check-ingestor` if checks should block merges, and configure any desired approvals on the GitHub `production` environment. For a repository-wide required check, remove workflow path filters or introduce an always-running gate so unrelated pull requests do not wait on a skipped workflow.
+Configure a branch protection rule requiring `check-ingestor` and `check-api` if checks should block merges, and configure any desired approvals on the GitHub `production` environment. For a repository-wide required check, remove workflow path filters or introduce an always-running gate so unrelated pull requests do not wait on a skipped workflow.
 
-Future workers and the frontend should have their own scoped check/deploy jobs, working directories, and concurrency groups. This workflow currently builds and deploys only `reddit-ingestor`.
+Both Workers have separate check/deploy jobs, working directories, and concurrency groups. Both are checked and deployed on matching workflow runs. Future workers and the frontend should follow this pattern.

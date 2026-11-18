@@ -1,14 +1,16 @@
-name: Ingestor CI/CD
+name: Workers CI/CD
 
 on:
   pull_request:
     paths:
       - 'reddit-ingestor/**'
+      - 'reddit-api/**'
       - '.github/workflows/deploy-workers.yml'
   push:
     branches: [rearchitecture]
     paths:
       - 'reddit-ingestor/**'
+      - 'reddit-api/**'
       - '.github/workflows/deploy-workers.yml'
   workflow_dispatch:
 
@@ -56,6 +58,51 @@ jobs:
           D1_DATABASE_NAME: ${{ secrets.D1_DATABASE_NAME }}
           D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
           YOUTUBE_SECRETS_STORE_ID: ${{ secrets.YOUTUBE_SECRETS_STORE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Remove production configuration
+        if: always()
+        run: rm -f wrangler.ci.json
+
+  check-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: reddit-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: reddit-api/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+
+  deploy-api:
+    needs: [check-api, deploy-ingestor]
+    if: github.ref == 'refs/heads/rearchitecture' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: reddit-api-production
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: reddit-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: reddit-api/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Deploy API
+        run: npm run deploy
+        env:
+          D1_DATABASE_NAME: ${{ secrets.D1_DATABASE_NAME }}
+          D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - name: Remove production configuration
