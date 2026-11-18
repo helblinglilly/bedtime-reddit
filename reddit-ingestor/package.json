@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "deploy": "npm run configure:ci && wrangler deploy --config wrangler.ci.json",
-        "configure:ci": "node scripts/configure-ci.mjs",
-        "check": "node --test scripts/configure-ci.test.mjs && wrangler types --check && tsc --noEmit && wrangler deploy --dry-run",
+    "deploy": "npm run configure:ci && wrangler d1 migrations apply DB --remote --config wrangler.ci.json && wrangler deploy --config wrangler.ci.json",
+    "configure:ci": "node scripts/configure-ci.mjs",
+    "check": "node --test scripts/configure-ci.test.mjs && wrangler types --check && tsc --noEmit && wrangler deploy --dry-run",
     "dev": "wrangler dev --test-scheduled",
     "start": "wrangler dev --test-scheduled",
     "cf-typegen": "wrangler types"
