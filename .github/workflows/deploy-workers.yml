@@ -1,0 +1,43 @@
+name: Deploy workers
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workers-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      # This repository does not track package-lock.json.
+      - run: npm install --no-audit --no-fund
+      - run: npm run workers:check
+      - name: Generate production configuration
+        run: npm run workers:configure:ci
+        env:
+          D1_DATABASE_NAME: ${{ secrets.D1_DATABASE_NAME }}
+          D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
+      - name: Migrate D1 and deploy workers
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx --no-install wrangler d1 migrations apply DB --remote --config workers/ingestion/wrangler.ci.jsonc
+          npx --no-install wrangler deploy --config workers/ingestion/wrangler.ci.jsonc
+          npx --no-install wrangler deploy --config workers/api/wrangler.ci.jsonc
+      - name: Remove production configuration
+        if: always()
+        run: rm -f workers/ingestion/wrangler.ci.jsonc workers/api/wrangler.ci.jsonc
