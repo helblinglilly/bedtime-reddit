@@ -11,7 +11,7 @@ export async function getChannelVideos(channelId: string, env: Env) {
 	}
 
 	if (!apiKey) {
-		return youtubeResponseMock;
+		return [];
 	}
 
 	const params = new URLSearchParams({
@@ -39,7 +39,7 @@ export async function getChannelVideos(channelId: string, env: Env) {
 
 	return body.items.map((item) => {
 		return {
-			videoId: item.id,
+			videoId: item.id.videoId,
 			videoTitle: item.snippet.title,
 			thumbnail: item.snippet.thumbnails.medium.url,
 			channel: {

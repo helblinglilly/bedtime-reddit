@@ -1,6 +1,6 @@
 import { YoutubeAPIResponse } from './types';
 
-export const youtubeResponseMock: YoutubeAPIResponse = {
+export const youtubeResponseMock: Extract<YoutubeAPIResponse, { items: unknown }> = {
 	kind: 'youtube#searchListResponse',
 	etag: 'nxlpywrbk-It264DGfSd0aUwdrE',
 	nextPageToken: 'CAUQAA',
