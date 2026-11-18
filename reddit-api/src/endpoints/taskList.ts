@@ -1,62 +1,48 @@
 import { OpenAPIRoute } from "chanfana";
 import { z } from "zod";
-import { type AppContext, Task } from "../types";
+import { type AppContext, Videos } from "../types";
 
-export class TaskList extends OpenAPIRoute {
-	schema = {
-		tags: ["Tasks"],
-		summary: "List Tasks",
-		request: {
-			query: z.object({
-				page: z.number().default(0).describe("Page number"),
-				isCompleted: z
-					.boolean()
-					.optional()
-					.describe("Filter by completed flag"),
-			}),
-		},
-		responses: {
-			"200": {
-				description: "Returns a list of tasks",
-				content: {
-					"application/json": {
-						schema: z.object({
-							success: z.boolean(),
-							tasks: Task.array(),
-						}),
-					},
-				},
-			},
-		},
-	};
+export class VideoList extends OpenAPIRoute {
+  schema = {
+    tags: ["Videos"],
+    summary: "Get Videos",
+    responses: {
+      "200": {
+        description: "Returns a list of recently uploaded videos",
+        content: {
+          "application/json": {
+            schema: Videos.array(),
+          },
+        },
+      },
+    },
+  };
 
-	async handle(c: AppContext) {
-		// Get validated data
-		const data = await this.getValidatedData<typeof this.schema>();
+  async handle(c: AppContext) {
+    const result = await c.env.DB.prepare(
+      "SELECT * FROM videos order by videos.created_at DESC",
+    ).all<{
+      id: number;
+      video_id: string;
+      video_title: string;
+      thumbnail_url: string;
+      channel_id: string;
+      channel_name: string;
+      uploaded_at: string;
+      created_at: string;
+    }>();
 
-		// Retrieve the validated parameters
-		const { page, isCompleted } = data.query;
+    const response = result.results.map((video) => {
+      return {
+        videoId: video.video_id,
+        videoTitle: video.video_title,
+        thumbnailUrl: video.thumbnail_url,
+        channelId: video.channel_id,
+        channelName: video.channel_name,
+        uploadedAt: new Date(video.uploaded_at),
+      };
+    });
 
-		// Implement your own object list here
-
-		return {
-			success: true,
-			tasks: [
-				{
-					name: "Clean my room",
-					slug: "clean-room",
-					description: undefined,
-					completed: false,
-					due_date: "2025-01-05",
-				},
-				{
-					name: "Build something awesome with Cloudflare Workers",
-					slug: "cloudflare-workers",
-					description: "Lorem Ipsum",
-					completed: true,
-					due_date: "2022-12-24",
-				},
-			],
-		};
-	}
+    return response;
+  }
 }
