@@ -20,54 +20,64 @@ import { getChannelVideos } from '../lib/youtubeApi/api';
 import { channels } from './channels';
 
 export default {
-	async fetch(req) {
+	async fetch(req, env) {
 		const url = new URL(req.url);
-		url.pathname = '/__scheduled';
-		url.searchParams.append('cron', '* * * * *');
-		return new Response(`To test the scheduled handler, ensure you have used the "--test-scheduled" then try running "curl ${url.href}".`);
+		if (url.pathname !== '/') {
+			return new Response('Not found', { status: 404 });
+		}
+		if (req.method !== 'GET') {
+			return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET' } });
+		}
+
+		await ingest(env);
+		return new Response('Ingestion completed', { headers: { 'Cache-Control': 'no-store' } });
 	},
 
 	// The scheduled handler is invoked at the interval set in our wrangler.jsonc's
 	// [[triggers]] configuration.
-	async scheduled(event, env, ctx): Promise<void> {
+	async scheduled(event, env): Promise<void> {
 		console.debug(`Triggered at ${event.cron}`);
-		const freshVideosPromises = await Promise.allSettled(
-			channels.map((channel) => {
-				return getChannelVideos(channel.id, env);
-			}),
-		);
-
-		const freshVideos = freshVideosPromises
-			.filter((promise) => promise.status === 'fulfilled')
-			.map((promise) => promise.value)
-			.flatMap((videos) => videos);
-		const errors = freshVideosPromises.filter((promise) => promise.status === 'rejected').map((promise) => promise.reason);
-
-		errors.forEach((error) => {
-			console.error(error);
-		});
-
-		if (freshVideos.length === 0 && errors.length > 0) {
-			throw new Error('All Youtube API Request have failed');
-		}
-
-		if (freshVideos.length > 0 && errors.length > 0) {
-			console.warn('Some API requests have failed');
-		}
-
-		const dbInserts = await Promise.allSettled(
-			freshVideos.map((video) => {
-				return insertVideo(video, env.DB);
-			}),
-		);
-
-		const success = dbInserts.filter((promise) => promise.status === 'fulfilled');
-		const dbErrors = dbInserts.filter((promise) => promise.status === 'rejected');
-
-		dbErrors.forEach((error) => {
-			console.error(error);
-		});
-
-		console.info(`Added ${success.length} new videos to the DB`);
+		await ingest(env);
 	},
 } satisfies ExportedHandler<Env>;
+
+async function ingest(env: Env): Promise<void> {
+	const freshVideosPromises = await Promise.allSettled(
+		channels.map((channel) => {
+			return getChannelVideos(channel.id, env);
+		}),
+	);
+
+	const freshVideos = freshVideosPromises
+		.filter((promise) => promise.status === 'fulfilled')
+		.map((promise) => promise.value)
+		.flatMap((videos) => videos);
+	const errors = freshVideosPromises.filter((promise) => promise.status === 'rejected').map((promise) => promise.reason);
+
+	errors.forEach((error) => {
+		console.error(error);
+	});
+
+	if (freshVideos.length === 0 && errors.length > 0) {
+		throw new Error('All Youtube API Request have failed');
+	}
+
+	if (freshVideos.length > 0 && errors.length > 0) {
+		console.warn('Some API requests have failed');
+	}
+
+	const dbInserts = await Promise.allSettled(
+		freshVideos.map((video) => {
+			return insertVideo(video, env.DB);
+		}),
+	);
+
+	const success = dbInserts.filter((promise) => promise.status === 'fulfilled');
+	const dbErrors = dbInserts.filter((promise) => promise.status === 'rejected');
+
+	dbErrors.forEach((error) => {
+		console.error(error);
+	});
+
+	console.info(`Added ${success.length} new videos to the DB`);
+}
