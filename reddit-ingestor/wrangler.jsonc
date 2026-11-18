@@ -10,6 +10,7 @@
 	"observability": {
 		"enabled": true
 	},
+	"workers_dev": false,
 	"triggers": {
 		"crons": [
 			"00 21 * * *", // 21:00
