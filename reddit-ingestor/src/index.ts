@@ -15,6 +15,7 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { insertVideo } from '../lib/db/insertVideo';
 import { getChannelVideos } from '../lib/youtubeApi/api';
 import { channels } from './channels';
 
@@ -29,13 +30,17 @@ export default {
 	// The scheduled handler is invoked at the interval set in our wrangler.jsonc's
 	// [[triggers]] configuration.
 	async scheduled(event, env, ctx): Promise<void> {
+		console.debug(`Triggered at ${event.cron}`);
 		const freshVideosPromises = await Promise.allSettled(
 			channels.map((channel) => {
 				return getChannelVideos(channel.id, env);
 			}),
 		);
 
-		const freshVideos = freshVideosPromises.filter((promise) => promise.status === 'fulfilled').map((promise) => promise.value);
+		const freshVideos = freshVideosPromises
+			.filter((promise) => promise.status === 'fulfilled')
+			.map((promise) => promise.value)
+			.flatMap((videos) => videos);
 		const errors = freshVideosPromises.filter((promise) => promise.status === 'rejected').map((promise) => promise.reason);
 
 		errors.forEach((error) => {
@@ -50,15 +55,19 @@ export default {
 			console.warn('Some API requests have failed');
 		}
 
-		// A Cron Trigger can make requests to other endpoints on the Internet,
-		// publish to a Queue, query a D1 Database, and much more.
-		//
-		// We'll keep it simple and make an API call to a Cloudflare API:
-		let resp = await fetch('https://api.cloudflare.com/client/v4/ips');
-		let wasSuccessful = resp.ok ? 'success' : 'fail';
+		const dbInserts = await Promise.allSettled(
+			freshVideos.map((video) => {
+				return insertVideo(video, env.DB);
+			}),
+		);
 
-		// You could store this result in KV, write to a D1 Database, or publish to a Queue.
-		// In this template, we'll just log the result:
-		console.log(`trigger fired at ${event.cron}: ${wasSuccessful}`);
+		const success = dbInserts.filter((promise) => promise.status === 'fulfilled');
+		const dbErrors = dbInserts.filter((promise) => promise.status === 'rejected');
+
+		dbErrors.forEach((error) => {
+			console.error(error);
+		});
+
+		console.info(`Added ${success.length} new videos to the DB`);
 	},
 } satisfies ExportedHandler<Env>;

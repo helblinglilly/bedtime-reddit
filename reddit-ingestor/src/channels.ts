@@ -17,4 +17,4 @@ export const channels = [
 	},
 ];
 
-export const API_URL = '';
+export const API_URL = 'https://www.googleapis.com';

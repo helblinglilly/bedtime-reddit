@@ -24,7 +24,8 @@ export async function getChannelVideos(channelId: string, env: Env) {
 		part: 'snippet',
 	});
 
-	const url = new URL(`/search?${params.toString()}`, API_URL);
+	const url = new URL(`/youtube/v3/search?${params.toString()}`, API_URL);
+	console.log(url.href);
 
 	const res = await fetch(url);
 
