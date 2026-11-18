@@ -27,12 +27,16 @@ From `reddit-api/`, using Node.js 24, run `npm ci` and `npm run dev`. Run `npm r
 
 The API shares the ingestor's D1 database through `env.DB`, but has no YouTube Secrets Store binding. Its checked-in database UUID is a local-development placeholder. `npm run deploy` requires `D1_DATABASE_ID` and generates the ignored `wrangler.ci.json`; `D1_DATABASE_NAME` optionally overrides `bedtime-reddit`. Do not deploy the checked-in configuration directly to production.
 
+## Reddit frontend
+
+From `reddit-frontend/`, using Node.js 24, run `npm ci` and `npm run dev`. Run `npm run check` for Svelte/TypeScript checks and `npm run build` for the production Cloudflare build. `npm run deploy` builds and deploys the frontend Worker.
+
 ## GitHub CI/CD
 
 `.github/workflows/deploy-workers.yml` owns application checks and deployment:
 
-- Pull requests affecting either Worker or the workflow run both Workers' checks without production secrets.
-- Matching pushes to `rearchitecture` run checks, then deploy both Workers using the GitHub `production` environment. The API waits for the ingestor deployment, which applies shared D1 migrations first.
+- Pull requests affecting any Worker, the frontend, or the workflow run all three applications' checks without production secrets. Frontend checks also build the production bundle.
+- Matching pushes to `rearchitecture` run checks, then deploy all three applications using the GitHub `production` environment. The API waits for the ingestor deployment, which applies shared D1 migrations first. The frontend deploys independently after its own checks pass.
 - Manual workflow dispatch can deploy from `rearchitecture` after checks pass.
 - Production deployments are serialized per worker.
 
@@ -50,6 +54,6 @@ Infrastructure reuses the existing account-wide Secrets Store and manages only i
 
 Terraform continues to own database provisioning; GitHub Actions owns Worker deployment. The ingestor deployment applies shared D1 migrations before deploying. The API does not apply migrations.
 
-Configure a branch protection rule requiring `check-ingestor` and `check-api` if checks should block merges, and configure any desired approvals on the GitHub `production` environment. For a repository-wide required check, remove workflow path filters or introduce an always-running gate so unrelated pull requests do not wait on a skipped workflow.
+Configure a branch protection rule requiring `check-ingestor`, `check-api`, and `check-frontend` if checks should block merges, and configure any desired approvals on the GitHub `production` environment. For a repository-wide required check, remove workflow path filters or introduce an always-running gate so unrelated pull requests do not wait on a skipped workflow.
 
-Both Workers have separate check/deploy jobs, working directories, and concurrency groups. Both are checked and deployed on matching workflow runs. Future workers and the frontend should follow this pattern.
+All three applications have separate check/deploy jobs, working directories, and concurrency groups. All are checked and deployed on matching workflow runs. The frontend reuses `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` from the `production` environment and needs no D1 or Secrets Store configuration. Future workers should follow this pattern.
