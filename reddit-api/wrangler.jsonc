@@ -10,12 +10,8 @@
 	"workers_dev": false,
 	"routes": [
 		{
-			"pattern": "reddit.helbling.uk/api",
-			"zone_name": "helbling.uk"
-		},
-		{
-			"pattern": "reddit.helbling.uk/api/*",
-			"zone_name": "helbling.uk"
+			"pattern": "api.reddit.helbling.uk",
+			"custom_domain": true
 		}
 	],
 	"observability": {
