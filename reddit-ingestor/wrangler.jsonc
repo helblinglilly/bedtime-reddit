@@ -12,7 +12,7 @@
 	},
 	"triggers": {
 		"crons": [
-			"0 0 1 * *"
+			"10 22 * * *"
 		]
 	},
 	"secrets_store_secrets": [
