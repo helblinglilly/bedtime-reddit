@@ -7,6 +7,13 @@
 	"name": "reddit-api",
 	"main": "src/index.ts",
 	"compatibility_date": "2026-11-18",
+	"workers_dev": false,
+	"routes": [
+		{
+			"pattern": "api.reddit.helbling.uk",
+			"custom_domain": true
+		}
+	],
 	"observability": {
 		"enabled": true
 	},
