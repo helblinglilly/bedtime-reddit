@@ -5,7 +5,11 @@
   "scripts": {
     "deploy": "npm run configure:ci && wrangler deploy --config wrangler.ci.json",
     "configure:ci": "node scripts/configure-ci.mjs",
-    "check": "node --test scripts/configure-ci.test.mjs && wrangler types --check && tsc --noEmit && wrangler deploy --dry-run",
+    "openapi:export": "tsx scripts/export-openapi.ts",
+    "openapi:check": "tsx scripts/export-openapi.ts --check",
+    "api:types": "npm run openapi:export && openapi-typescript openapi.json -o ../reddit-frontend/src/lib/api/schema.d.ts",
+    "api:types:check": "npm run openapi:check && openapi-typescript openapi.json -o ../reddit-frontend/src/lib/api/schema.d.ts --check",
+    "check": "npm run openapi:check && tsx --test scripts/openapi.test.ts && node --test scripts/configure-ci.test.mjs && wrangler types --check && tsc --noEmit && wrangler deploy --dry-run",
     "dev": "wrangler dev",
     "start": "wrangler dev",
     "cf-typegen": "wrangler types"
@@ -17,6 +21,8 @@
   },
   "devDependencies": {
     "@types/node": "^25.9.9",
+    "openapi-typescript": "^7.13.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "wrangler": "^4.165.0"
   }

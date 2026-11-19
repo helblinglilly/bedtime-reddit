@@ -1,0 +1,74 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "OpenAPI"
+  },
+  "components": {
+    "schemas": {},
+    "parameters": {}
+  },
+  "paths": {
+    "/videos": {
+      "get": {
+        "tags": [
+          "Videos"
+        ],
+        "summary": "Get Videos",
+        "operationId": "get_VideoList",
+        "responses": {
+          "200": {
+            "description": "Returns a list of recently uploaded videos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "videoId": {
+                        "type": "string",
+                        "example": "jNQXAC9IVRw",
+                        "description": "Youtube Video ID that's part of the URL"
+                      },
+                      "videoTitle": {
+                        "type": "string",
+                        "example": "A day at the Zoo"
+                      },
+                      "thumbnailUrl": {
+                        "type": "string"
+                      },
+                      "channelId": {
+                        "type": "string",
+                        "example": "UC4QobU6STFB0P71PMvOGN5A",
+                        "description": "Youtube ID for the uploader's channel. May be required to form a valid URL"
+                      },
+                      "channelName": {
+                        "type": "string",
+                        "example": "jawed",
+                        "description": "Human readable name"
+                      },
+                      "uploadedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "videoId",
+                      "videoTitle",
+                      "thumbnailUrl",
+                      "channelId",
+                      "channelName",
+                      "uploadedAt"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}

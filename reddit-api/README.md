@@ -20,6 +20,14 @@ The checked-in Wrangler configuration uses a dummy D1 UUID. Do not deploy it dir
 2. Each endpoint has its own file in `src/endpoints/`.
 3. For more information read the [chanfana documentation](https://chanfana.pages.dev/) and [Hono documentation](https://hono.dev/docs).
 
+## OpenAPI export and frontend types
+
+`npm run openapi:export` writes the router's OpenAPI document to `openapi.json` without starting a server or accessing D1. The running API also serves this document at `/openapi.json`.
+
+After changing a response schema, run `npm run api:types` (also available from `reddit-frontend`) and commit `openapi.json` and `../reddit-frontend/src/lib/api/schema.d.ts`. `npm run openapi:check`, included in API checks, detects stale schema exports. `npm run api:types:check` checks both generated artifacts without modifying them.
+
+`uploadedAt` is an ISO 8601 UTC datetime string in JSON, described by `z.iso.datetime()`.
+
 ## Development
 
 1. Run `wrangler dev` to start a local instance of the API.

@@ -19,5 +19,5 @@ export const Videos = z.object({
     example: "jawed",
     description: "Human readable name",
   }),
-  uploadedAt: z.iso.date(),
+  uploadedAt: z.iso.datetime(),
 });

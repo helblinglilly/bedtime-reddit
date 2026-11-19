@@ -1,5 +1,5 @@
 import { OpenAPIRoute } from "chanfana";
-import { z } from "zod";
+
 import { type AppContext, Videos } from "../types";
 
 export class VideoList extends OpenAPIRoute {
@@ -39,7 +39,7 @@ export class VideoList extends OpenAPIRoute {
         thumbnailUrl: video.thumbnail_url,
         channelId: video.channel_id,
         channelName: video.channel_name,
-        uploadedAt: new Date(video.uploaded_at),
+        uploadedAt: new Date(video.uploaded_at).toISOString(),
       };
     });
 

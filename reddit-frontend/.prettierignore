@@ -5,5 +5,8 @@ yarn.lock
 bun.lock
 bun.lockb
 
+# Keep generated API types byte-for-byte identical to openapi-typescript output.
+/src/lib/api/schema.d.ts
+
 # Miscellaneous
 /static/

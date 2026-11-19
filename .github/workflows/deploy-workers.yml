@@ -31,8 +31,11 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-          cache-dependency-path: reddit-frontend/package-lock.json
+          cache-dependency-path: |
+            reddit-frontend/package-lock.json
+            reddit-api/package-lock.json
       - run: npm ci --no-audit --no-fund
+      - run: npm ci --prefix ../reddit-api --no-audit --no-fund
       - run: npm run check
       - run: npm run build
 

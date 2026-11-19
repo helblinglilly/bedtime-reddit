@@ -43,6 +43,20 @@ npm run dev
 npm run dev -- --open
 ```
 
+## API types
+
+The API's Zod/OpenAPI definitions are the source of truth. Install dependencies in both `reddit-api` and `reddit-frontend` using Node.js 24, then run from this directory:
+
+```sh
+npm run api:types
+```
+
+This exports `../reddit-api/openapi.json` directly from the API router (no running server, D1, or credentials required) and generates `src/lib/api/schema.d.ts`. Commit both generated files after changing an API contract. Do not edit them manually.
+
+Import `Video` and `VideosResponse` from `#lib/api/types.js`, or import `paths` from `#lib/api/schema.js` for other endpoint types. JSON timestamps such as `uploadedAt` are strings; convert them with `new Date(...)` when needed. Generated types do not perform runtime response validation.
+
+`npm run check` includes `npm run api:types:check`, which fails if either the exported schema or generated types are stale. The generator lives in `reddit-api` because its TypeScript 5 dependency satisfies `openapi-typescript`'s peer requirement; the frontend remains on TypeScript 6. CI installs both applications' dependencies for frontend checks.
+
 ## Building
 
 To create a production version of your app:
