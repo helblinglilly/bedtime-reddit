@@ -12,6 +12,12 @@
 		"binding": "ASSETS",
 		"directory": ".svelte-kit/cloudflare"
 	},
+	"routes": [
+		{
+			"pattern": "reddit.helbling.uk",
+			"custom_domain": true
+		}
+	],
 	"observability": {
 		"enabled": true
 	},
