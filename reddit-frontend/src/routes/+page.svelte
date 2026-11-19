@@ -77,9 +77,9 @@
 
 {#if channels.length > 0}
 	<footer class="border-t border-white/10 py-6">
-		<h2 id="channels-heading" class="text-xl font-semibold">Explore the channels</h2>
+		<h2 id="channels-heading" class="text-xl font-semibold">Backup links</h2>
 		<nav aria-labelledby="channels-heading" class="mt-4">
-			<ul class="flex flex-wrap gap-x-6 gap-y-3">
+			<ul class="flex flex-col lg:flex-row gap-x-6 gap-y-3">
 				{#each channels as channel (channel.id)}
 					<li>
 						<!-- eslint-disable svelte/no-navigation-without-resolve -- YouTube URLs use HTTPS or a native app scheme, not SvelteKit routes. -->
