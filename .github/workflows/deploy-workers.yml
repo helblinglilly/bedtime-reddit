@@ -8,7 +8,7 @@ on:
       - 'reddit-frontend/**'
       - '.github/workflows/deploy-workers.yml'
   push:
-    branches: [rearchitecture]
+    branches: [main]
     paths:
       - 'reddit-ingestor/**'
       - 'reddit-api/**'
@@ -41,7 +41,7 @@ jobs:
 
   deploy-frontend:
     needs: check-frontend
-    if: github.ref == 'refs/heads/rearchitecture' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment: production
     concurrency:
@@ -81,7 +81,7 @@ jobs:
 
   deploy-ingestor:
     needs: check-ingestor
-    if: github.ref == 'refs/heads/rearchitecture' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment: production
     concurrency:
@@ -127,7 +127,7 @@ jobs:
 
   deploy-api:
     needs: [check-api, deploy-ingestor]
-    if: github.ref == 'refs/heads/rearchitecture' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment: production
     concurrency:
