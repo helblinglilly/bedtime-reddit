@@ -15,8 +15,9 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-import { insertVideo } from '../lib/db/insertVideo';
+import { insertVideos } from '../lib/db/insertVideos';
 import { getChannelVideos } from '../lib/youtubeApi/search/api';
+import { getVideoRuntimes } from '../lib/youtubeApi/videos/api';
 import { channels } from './channels';
 
 export default {
@@ -55,11 +56,17 @@ export default {
 			console.warn('Some API requests have failed');
 		}
 
-		const dbInserts = await Promise.allSettled(
-			freshVideos.map((video) => {
-				return insertVideo(video, env.DB);
-			}),
-		);
+		let runtimes = new Map<string, number | null>();
+		try {
+			runtimes = await getVideoRuntimes(
+				freshVideos.map((video) => video.videoId),
+				env,
+			);
+		} catch {
+			console.warn('Failed to fetch video runtimes; inserting videos without runtime');
+		}
+
+		const dbInserts = await insertVideos(freshVideos, runtimes, env.DB);
 
 		const success = dbInserts.filter((promise) => promise.status === 'fulfilled');
 		const dbErrors = dbInserts.filter((promise) => promise.status === 'rejected');

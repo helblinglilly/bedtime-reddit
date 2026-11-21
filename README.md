@@ -11,7 +11,9 @@ npm run dev
 
 The scheduled Worker has a D1 binding at `env.DB`. The checked-in Wrangler configuration uses a dummy database UUID for local development and dry-run builds; local Wrangler uses a separate local database. Never deploy that configuration directly to production.
 
-Only the ingestor has the `YOUTUBE_API_KEY` Secrets Store binding, typed as `SecretsStoreSecret`. Future YouTube integration must retrieve the value at runtime with `await env.YOUTUBE_API_KEY.get()`, not treat the binding as a string. No YouTube API calls are implemented yet. Never log the returned value.
+Only the ingestor has the `YOUTUBE_API_KEY` Secrets Store binding, typed as `SecretsStoreSecret`. Retrieve the value at runtime with `await env.YOUTUBE_API_KEY.get()`, not treat the binding as a string. Never log the returned value or request URLs containing it.
+
+The ingestor searches for recent videos per channel, then looks up runtimes for all collected videos using `videos.list` in batches of up to 50 unique IDs. The database's nullable `runtime` column stores duration in seconds. Missing or zero-length durations and lookup failures result in `NULL` without blocking insertion. Existing rows are not backfilled or updated on conflict. Apply migration `0003_add_runtime.sql` before running the updated ingestor; deployment applies migrations automatically.
 
 The checked-in Secrets Store binding uses a dummy store UUID and the secret name `BEDTIME_REDDIT_YOUTUBE_API_KEY`. For local development, create a local-only test secret (omit `--remote`; local Workers cannot read production Secrets Store values):
 
