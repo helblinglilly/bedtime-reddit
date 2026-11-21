@@ -10,7 +10,7 @@ export function recordView(videoId: string) {
 		const difference = Math.abs(now.valueOf() - video.timestamp.valueOf());
 		const daysDifference = difference / (1000 * 3600 * 24);
 
-		if (daysDifference > 31) {
+		if (daysDifference > 31 * 3) {
 			return false;
 		}
 
