@@ -20,4 +20,9 @@ export const Videos = z.object({
     description: "Human readable name",
   }),
   uploadedAt: z.iso.datetime(),
+  runtime: z.int().nonnegative().openapi({
+    example: 2712,
+    description:
+      "Video runtime in seconds. For example, 2712 is 45 minutes and 12 seconds. Returns 0 when runtime is unavailable.",
+  }),
 });

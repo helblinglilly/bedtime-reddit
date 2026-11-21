@@ -26,7 +26,7 @@ The checked-in Wrangler configuration uses a dummy D1 UUID. Do not deploy it dir
 
 After changing a response schema, run `npm run api:types` (also available from `reddit-frontend`) and commit `openapi.json` and `../reddit-frontend/src/lib/api/schema.d.ts`. `npm run openapi:check`, included in API checks, detects stale schema exports. `npm run api:types:check` checks both generated artifacts without modifying them.
 
-`uploadedAt` is an ISO 8601 UTC datetime string in JSON, described by `z.iso.datetime()`.
+`uploadedAt` is an ISO 8601 UTC datetime string in JSON, described by `z.iso.datetime()`. `runtime` is a non-negative integer in seconds, returning `0` when the database runtime is unavailable.
 
 ## Development
 

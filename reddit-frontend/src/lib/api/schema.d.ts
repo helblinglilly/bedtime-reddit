@@ -69,6 +69,11 @@ export interface operations {
                         channelName: string;
                         /** Format: date-time */
                         uploadedAt: string;
+                        /**
+                         * @description Video runtime in seconds. For example, 2712 is 45 minutes and 12 seconds. Returns 0 when runtime is unavailable.
+                         * @example 2712
+                         */
+                        runtime: number;
                     }[];
                 };
             };

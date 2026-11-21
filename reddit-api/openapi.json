@@ -51,6 +51,12 @@
                       "uploadedAt": {
                         "type": "string",
                         "format": "date-time"
+                      },
+                      "runtime": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 2712,
+                        "description": "Video runtime in seconds. For example, 2712 is 45 minutes and 12 seconds. Returns 0 when runtime is unavailable."
                       }
                     },
                     "required": [
@@ -59,7 +65,8 @@
                       "thumbnailUrl",
                       "channelId",
                       "channelName",
-                      "uploadedAt"
+                      "uploadedAt",
+                      "runtime"
                     ]
                   }
                 }

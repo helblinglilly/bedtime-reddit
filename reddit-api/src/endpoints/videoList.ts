@@ -30,6 +30,7 @@ export class VideoList extends OpenAPIRoute {
       channel_name: string;
       uploaded_at: string;
       created_at: string;
+      runtime: number | null;
     }>();
 
     const response = result.results.map((video) => {
@@ -40,6 +41,7 @@ export class VideoList extends OpenAPIRoute {
         channelId: video.channel_id,
         channelName: video.channel_name,
         uploadedAt: new Date(video.uploaded_at).toISOString(),
+        runtime: video.runtime ?? 0,
       };
     });
 
