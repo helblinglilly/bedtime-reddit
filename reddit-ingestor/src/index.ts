@@ -16,7 +16,7 @@
  */
 
 import { insertVideo } from '../lib/db/insertVideo';
-import { getChannelVideos } from '../lib/youtubeApi/search/apirch/api';
+import { getChannelVideos } from '../lib/youtubeApi/search/api';
 import { channels } from './channels';
 
 export default {
