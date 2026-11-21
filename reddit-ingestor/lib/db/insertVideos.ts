@@ -18,4 +18,6 @@ async function insertVideo(video: Video, runtime: number | null, db: Env['DB']) 
 		)
 		.bind(video.videoId, video.videoTitle, video.thumbnail, video.channel.id, video.channel.name, video.uploadedAt, runtime)
 		.first<{ id: number }>();
+
+	await db.prepare("DELETE FROM videos WHERE datetime(uploaded_at) < datetime('now', '-3 month')").run();
 }
