@@ -1,5 +1,4 @@
-import { API_URL } from '../../src/channels';
-import { youtubeResponseMock } from './mocks';
+import { API_URL } from '../../../src/channels';
 import { YoutubeAPIResponse } from './types';
 
 export async function getChannelVideos(channelId: string, env: Env) {
@@ -7,7 +6,7 @@ export async function getChannelVideos(channelId: string, env: Env) {
 	try {
 		apiKey = await env.YOUTUBE_API_KEY.get();
 	} catch (error) {
-		console.error('Failed to get YOUTUBE_API_KEY env variable - using Mocks', error);
+		console.error('Failed to get YOUTUBE_API_KEY env variable', error);
 	}
 
 	if (!apiKey) {
@@ -25,7 +24,6 @@ export async function getChannelVideos(channelId: string, env: Env) {
 	});
 
 	const url = new URL(`/youtube/v3/search?${params.toString()}`, API_URL);
-	console.log(url.href);
 
 	const res = await fetch(url);
 

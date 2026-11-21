@@ -1,4 +1,4 @@
-import type { getChannelVideos } from '../youtubeApi/api';
+import { getChannelVideos } from '../youtubeApi/search/api';
 
 type Video = Awaited<ReturnType<typeof getChannelVideos>>[number];
 
