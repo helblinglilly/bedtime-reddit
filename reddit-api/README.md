@@ -8,11 +8,11 @@ This is an example project made to be used as a quick start into building OpenAP
 ## Get started
 
 1. Sign up for [Cloudflare Workers](https://workers.dev). The free tier is more than enough for most use cases.
-2. Clone this project and install dependencies with `npm install`
+2. From `reddit-api/`, using Node.js 24, install dependencies with `npm ci`.
 3. Run `npm run dev` for local development and `npm run check` to validate the API.
-4. Production deployment is managed by the repository's GitHub Actions workflow on `rearchitecture`, using the shared `production` environment credentials and D1 configuration. See [the repository README](../README.md#github-cicd).
+4. Production deployment is managed by the repository's GitHub Actions workflow on `main`, using the shared `production` environment credentials and D1 configuration. See [shared GitHub CI/CD](../reddit-ingestor/README.md#shared-github-cicd) for workflow triggers, required secrets, concurrency, and branch protection guidance.
 
-The checked-in Wrangler configuration uses a dummy D1 UUID. Do not deploy it directly. For an authenticated manual deployment, set `D1_DATABASE_ID` (and optionally `D1_DATABASE_NAME`) and run `npm run deploy`. This generates the ignored `wrangler.ci.json`; remove that file afterward. Shared database migrations are owned by the ingestor deployment.
+The API shares the ingestor's D1 database through `env.DB`, but has no YouTube Secrets Store binding. The checked-in Wrangler configuration uses a dummy D1 UUID. Do not deploy it directly. For an authenticated manual deployment, set `D1_DATABASE_ID` (and optionally `D1_DATABASE_NAME`) and run `npm run deploy`. This generates the ignored `wrangler.ci.json`; remove that file afterward. Shared database migrations are owned by the ingestor deployment.
 
 ## Project structure
 
@@ -29,6 +29,9 @@ After changing a response schema, run `npm run api:types` (also available from `
 `uploadedAt` is an ISO 8601 UTC datetime string in JSON, described by `z.iso.datetime()`. `runtime` is a non-negative integer in seconds, returning `0` when the database runtime is unavailable.
 
 ## Development
+
+Run `npm run check` for OpenAPI consistency checks, existing OpenAPI and configuration-generator tests, generated-type checks, TypeScript, and a dry-run build. Run `npm run cf-typegen` after changing bindings.
+
 
 1. Run `wrangler dev` to start a local instance of the API.
 2. Open `http://localhost:8787/` in your browser to see the Swagger interface where you can try the endpoints.

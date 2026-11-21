@@ -34,7 +34,7 @@ npx sv add tailwindcss
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+From `reddit-frontend/`, using Node.js 24, install dependencies with `npm ci`, then start a development server:
 
 ```sh
 npm run dev
@@ -67,4 +67,12 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Run `npm run check` for generated API-type consistency and Svelte/TypeScript checks, and `npm run build` for the production Cloudflare build.
+
+## Deployment
+
+`npm run deploy` builds and deploys the frontend Worker using the project's Cloudflare adapter.
+
+GitHub Actions deploys the frontend on matching pushes to `main` and manual dispatches from `main`, after its checks and production build pass. It deploys independently of the ingestor and API, with its own working directory and production concurrency group.
+
+The frontend reuses `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` from the GitHub `production` environment and needs no D1 or Secrets Store configuration. See [shared GitHub CI/CD](../reddit-ingestor/README.md#shared-github-cicd) for workflow triggers, required secrets, and branch protection guidance.
