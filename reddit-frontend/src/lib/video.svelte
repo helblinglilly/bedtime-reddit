@@ -10,9 +10,19 @@
 	const hasTouchscreen = getTouchscreen();
 	const title = $derived(decodeHTML(video.videoTitle));
 
-	const isWatched = $derived(isVideoWatched(video.videoId))
+	let isWatched = $state(false);
+
+		function refreshWatched() {
+			isWatched = isVideoWatched(video.videoId);
+		}
+
+		$effect(() => {
+			refreshWatched();
+		});
 	const runTime = $derived(parseRuntime(video.runtime))
 </script>
+
+<svelte:window onfocus={refreshWatched} onpageshow={refreshWatched} />
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- YouTube URLs use HTTPS or a native app scheme, not SvelteKit routes. -->
 <a
@@ -29,6 +39,7 @@
 
 
 		recordView(video.videoId);
+		refreshWatched();
 		window.location.assign(href);
 	}}
 >
